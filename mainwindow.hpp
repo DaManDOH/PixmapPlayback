@@ -5,7 +5,7 @@
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
-class MainWindow;
+class PixmapPlaybackMainWindow;
 }
 QT_END_NAMESPACE
 
@@ -21,8 +21,9 @@ private slots:
     void openTriggered();
 
 private:
-    Ui::MainWindow *ui;
-    QString m_inputFolder;
+    Ui::PixmapPlaybackMainWindow *ui;
+    double m_interframeDelay = 1.0 / 20.0; // 20 FPS
+    QString m_inputFolderLoc;
     QList<QPixmap> m_pixmaps;
 
     void clearAndLoadPixmaps();
