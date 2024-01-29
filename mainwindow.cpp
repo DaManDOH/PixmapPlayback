@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    auto const onlyScene = new QGraphicsScene{this};
+    auto const onlyScene = new QGraphicsScene{ui->graphicsView};
     ui->graphicsView->setScene(onlyScene);
 
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::openTriggered);
@@ -31,16 +31,16 @@ void MainWindow::openTriggered()
                                                          QFileDialog::ShowDirsOnly
                                                              | QFileDialog::DontUseNativeDialog);
     if (!m_inputFolderLoc.isEmpty()) {
-        clearAndLoadPixmaps();
+        loadPixmaps();
         renderAllPixmapsWithDelay();
     }
 }
 
-void MainWindow::clearAndLoadPixmaps()
+void MainWindow::loadPixmaps()
 {
     QDir const currDir{m_inputFolderLoc};
     auto const currDirEntries = currDir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-    m_pixmaps.clear();
+    m_pixmaps.clear(); // Release previous pixmaps.
     std::transform(currDirEntries.constBegin(),
                    currDirEntries.constEnd(),
                    std::back_inserter(m_pixmaps),
@@ -52,10 +52,13 @@ void MainWindow::clearAndLoadPixmaps()
 
 void MainWindow::renderAllPixmapsWithDelay()
 {
+    // Move the timing off the UI thread to keep the window from locking up during delays.
     QThreadPool::globalInstance()->start([this]() {
         std::for_each(m_pixmaps.constBegin(), m_pixmaps.constEnd(), [this](auto const &oneBitmap) {
             ui->graphicsView->scene()->clear();
             ui->graphicsView->scene()->addPixmap(oneBitmap);
+            qDebug() << (unsigned long long) &oneBitmap;
+            QThread::usleep(m_interframeDelay);
         });
     });
 }

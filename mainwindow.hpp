@@ -22,11 +22,14 @@ private slots:
 
 private:
     Ui::PixmapPlaybackMainWindow *ui;
-    double m_interframeDelay = 1.0 / 20.0; // 20 FPS
+
+    // 20 FPS in ms; not compensating for active CPU time during render
+    unsigned long m_interframeDelay = 50UL;
+
     QString m_inputFolderLoc;
     QList<QPixmap> m_pixmaps;
 
-    void clearAndLoadPixmaps();
+    void loadPixmaps();
     void renderAllPixmapsWithDelay();
 };
 #endif // MAINWINDOW_HPP
