@@ -62,6 +62,8 @@ void MainWindow::renderAllPixmapsWithDelay()
         ui->graphicsView->scene()->clear();
         ui->graphicsView->scene()->addPixmap(onePixmap);
         qDebug("0x%016x", (unsigned long long) &onePixmap);
-        QThread::usleep(m_interframeDelay); // Locks up UI, then displays only last image.
+
+        // Locks up UI, then displays only last image in m_pixmaps member collection.
+        QThread::usleep(m_interframeDelay);
     });
 }
