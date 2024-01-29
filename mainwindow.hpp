@@ -21,8 +21,15 @@ private slots:
     void openTriggered();
 
 private:
+    static QString const sm_logMsgPattern;
+
     Ui::PixmapPlaybackMainWindow *ui;
-    double m_interframeDelay = 1.0 / 20.0; // 20 FPS
+
+    // // 20 FPS in µs; not compensating for active CPU time during render
+    // unsigned long m_interframeDelay = 50000UL;
+    // 0.5 FPS in µs
+    unsigned long m_interframeDelay = 2000000UL;
+
     QString m_inputFolderLoc;
     QList<QPixmap> m_pixmaps;
 

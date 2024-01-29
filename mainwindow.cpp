@@ -3,13 +3,19 @@
 
 #include <QFileDialog>
 #include <QThreadPool>
+#include <QtDebug>
+#include <QtLogging>
 
 #include <algorithm>
+
+QString const MainWindow::sm_logMsgPattern = R"(%{time yyyy-MM-dd HH:mm:ss.zzztt} - %{message})";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::PixmapPlaybackMainWindow)
 {
+    qSetMessagePattern(sm_logMsgPattern);
+
     ui->setupUi(this);
 
     auto const onlyScene = new QGraphicsScene{this};
@@ -52,10 +58,10 @@ void MainWindow::clearAndLoadPixmaps()
 
 void MainWindow::renderAllPixmapsWithDelay()
 {
-    QThreadPool::globalInstance()->start([this]() {
-        std::for_each(m_pixmaps.constBegin(), m_pixmaps.constEnd(), [this](auto const &oneBitmap) {
-            ui->graphicsView->scene()->clear();
-            ui->graphicsView->scene()->addPixmap(oneBitmap);
-        });
+    std::for_each(m_pixmaps.constBegin(), m_pixmaps.constEnd(), [this](auto const &onePixmap) {
+        ui->graphicsView->scene()->clear();
+        ui->graphicsView->scene()->addPixmap(onePixmap);
+        qDebug("0x%016x", (unsigned long long) &onePixmap);
+        QThread::usleep(m_interframeDelay); // Locks up UI, then displays only last image.
     });
 }

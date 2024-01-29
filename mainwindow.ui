@@ -58,7 +58,7 @@
   </widget>
   <action name="actionOpen">
    <property name="text">
-    <string>Open...</string>
+    <string>&amp;Open...</string>
    </property>
    <property name="toolTip">
     <string>Open a directory for reading</string>
