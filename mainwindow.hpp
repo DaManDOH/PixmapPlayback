@@ -2,6 +2,9 @@
 #define MAINWINDOW_HPP
 
 #include <QMainWindow>
+#include <QTimer>
+
+#include <memory>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,21 +22,23 @@ public:
 
 private slots:
     void openTriggered();
+    void doLoopToggled(bool);
 
 private:
     static QString const sm_logMsgPattern;
 
     Ui::PixmapPlaybackMainWindow *ui;
 
-    // // 20 FPS in µs; not compensating for active CPU time during render
-    // unsigned long m_interframeDelay = 50000UL;
-    // 0.5 FPS in µs
-    unsigned long m_interframeDelay = 2000000UL;
+    // 20 FPS in ms; not compensating for active CPU time during render
+    unsigned long m_interframeDelay = 50UL;
 
     QString m_inputFolderLoc;
     QList<QPixmap> m_pixmaps;
+    std::unique_ptr<QTimer> m_renderTimer;
+    qsizetype m_currentFrameIdx = -1LL; // Immediately incremented on each call of renderNextPixmap().
 
+    void connectUiActions();
     void clearAndLoadPixmaps();
-    void renderAllPixmapsWithDelay();
+    void renderNextPixmap();
 };
 #endif // MAINWINDOW_HPP
